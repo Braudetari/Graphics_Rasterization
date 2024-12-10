@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<parameters>
+    <modelFileName>C:\Users\Leo\eclipse-workspace\Rasterization\Models\models_0to600\ex_01___sphere_0to600.obj</modelFileName>
+    <saveImagePath>./Models/</saveImagePath>
+    <projectionType>ORTHOGRAPHIC</projectionType>
+    <displayType>FACE_EDGES</displayType>
+    <displayNormals>false</displayNormals>
+    <exercise>EX_1___Lines_rasterization</exercise>
+</parameters>
