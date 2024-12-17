@@ -96,40 +96,51 @@ public class BarycentricCoordinates {
 	
 	public static void main(String[] args) {
 		
-		////////////////////////////////////////////////////////////////////////////////////
-		////////////////////////////////////////////////////////////////////////////////////
-		/////////////// solution ///////////////////////////////////////////////////////////
-		////////////////////////////////////////////////////////////////////////////////////
-		////////////////////////////////////////////////////////////////////////////////////
-		Vector3f v1 = new Vector3f(1,1,10);
-		Vector3f v2 = new Vector3f(10,1,20);
-		Vector3f v3 = new Vector3f(5.5f,7,30);
-		BarycentricCoordinates barycentricCoordinates = new BarycentricCoordinates(v1,v2,v3);
-		barycentricCoordinates.calcCoordinatesForPoint(5.5f, 2);
-		System.out.println(barycentricCoordinates);
-		System.out.println(barycentricCoordinates.isPointInside());
-		barycentricCoordinates.calcCoordinatesForPoint(5.5f, 0);
-		System.out.println(barycentricCoordinates);
-		System.out.println(barycentricCoordinates.isPointInside());
-		System.out.println();
+		Vector3f v1 = new Vector3f(5,1,0);
+		Vector3f v2 = new Vector3f(10,3,0);
+		Vector3f v3 = new Vector3f(7,4,0);
+		BarycentricCoordinates bc = new BarycentricCoordinates(v1, v2, v3);
+		bc.calcCoordinatesForPoint(7, 2);
+		System.out.println(bc);
+		System.out.println(bc.isPointInside());
+		bc.calcCoordinatesForPoint(7, 1);
+		System.out.println(bc);
+		System.out.println(bc.isPointInside());
 		
-
-		Vector3f v1_ = new Vector3f(0,0,0);
-		Vector3f v2_ = new Vector3f(10,0,0);
-		Vector3f v3_ = new Vector3f(5,10,0);
-		BarycentricCoordinates barycentricCoordinates_ = new BarycentricCoordinates(v1_,v2_,v3_);
-		barycentricCoordinates_.calcCoordinatesForPoint(5,0);
-		System.out.println(barycentricCoordinates_);
-		System.out.println(barycentricCoordinates_.interpolate(10, 30, 60));
-		barycentricCoordinates_.calcCoordinatesForPoint(5,5);
-		System.out.println(barycentricCoordinates_);
-		System.out.println(barycentricCoordinates_.interpolate(10, 30, 60));
-		
-		////////////////////////////////////////////////////////////////////////////////////
-		////////////////////////////////////////////////////////////////////////////////////
-		/////////////// solution ///////////////////////////////////////////////////////////
-		////////////////////////////////////////////////////////////////////////////////////
-		////////////////////////////////////////////////////////////////////////////////////
+//		////////////////////////////////////////////////////////////////////////////////////
+//		////////////////////////////////////////////////////////////////////////////////////
+//		/////////////// solution ///////////////////////////////////////////////////////////
+//		////////////////////////////////////////////////////////////////////////////////////
+//		////////////////////////////////////////////////////////////////////////////////////
+//		Vector3f v1 = new Vector3f(1,1,10);
+//		Vector3f v2 = new Vector3f(10,1,20);
+//		Vector3f v3 = new Vector3f(5.5f,7,30);
+//		BarycentricCoordinates barycentricCoordinates = new BarycentricCoordinates(v1,v2,v3);
+//		barycentricCoordinates.calcCoordinatesForPoint(5.5f, 2);
+//		System.out.println(barycentricCoordinates);
+//		System.out.println(barycentricCoordinates.isPointInside());
+//		barycentricCoordinates.calcCoordinatesForPoint(5.5f, 0);
+//		System.out.println(barycentricCoordinates);
+//		System.out.println(barycentricCoordinates.isPointInside());
+//		System.out.println();
+//		
+//
+//		Vector3f v1_ = new Vector3f(0,0,0);
+//		Vector3f v2_ = new Vector3f(10,0,0);
+//		Vector3f v3_ = new Vector3f(5,10,0);
+//		BarycentricCoordinates barycentricCoordinates_ = new BarycentricCoordinates(v1_,v2_,v3_);
+//		barycentricCoordinates_.calcCoordinatesForPoint(5,0);
+//		System.out.println(barycentricCoordinates_);
+//		System.out.println(barycentricCoordinates_.interpolate(10, 30, 60));
+//		barycentricCoordinates_.calcCoordinatesForPoint(5,5);
+//		System.out.println(barycentricCoordinates_);
+//		System.out.println(barycentricCoordinates_.interpolate(10, 30, 60));
+//		
+//		////////////////////////////////////////////////////////////////////////////////////
+//		////////////////////////////////////////////////////////////////////////////////////
+//		/////////////// solution ///////////////////////////////////////////////////////////
+//		////////////////////////////////////////////////////////////////////////////////////
+//		////////////////////////////////////////////////////////////////////////////////////
 	
 	}
 	
