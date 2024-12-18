@@ -183,8 +183,8 @@ public class ObjectModel {
 			drawLineDDA(intBufferWrapper, vertex1.pointWindowCoordinates, vertex3.pointWindowCoordinates, 1f, 1f, 1f);
 			drawLineDDA(intBufferWrapper, vertex2.pointWindowCoordinates, vertex3.pointWindowCoordinates, 1f, 1f, 1f);
 		} else {
-			Vector4i box = calcBoundingBox(vertex1.pointObjectCoordinates, vertex2.pointObjectCoordinates, vertex3.pointObjectCoordinates, imageWidth, imageHeight);
-			BarycentricCoordinates bc = new BarycentricCoordinates(vertex1.pointObjectCoordinates, vertex2.pointObjectCoordinates, vertex3.pointObjectCoordinates);
+			Vector4i box = calcBoundingBox(vertex1.pointWindowCoordinates, vertex2.pointWindowCoordinates, vertex3.pointWindowCoordinates, imageWidth, imageHeight);
+			BarycentricCoordinates bc = new BarycentricCoordinates(vertex1.pointWindowCoordinates, vertex2.pointWindowCoordinates, vertex3.pointWindowCoordinates);
 			for(int y=box.z; y<=box.w; y++) { //Box Y Boundaries (z,w)
 				for(int x=box.x; x<=box.y; x++) { //Box X Boundaries (x,y)
 					FragmentData fragmentData = new FragmentData();
