@@ -103,7 +103,9 @@ public class ObjectModel {
 
 	public void render(IntBufferWrapper intBufferWrapper) {
 		exercise = worldModel.exercise;
-
+		Vector4f lightPos4H = new Vector4f(worldModel.lightPositionWorldCoordinates,1f);
+		Vector4f lightPosTransformed = new Matrix4f(lookatM).transform(lightPos4H);
+		lightPositionEyeCoordinates = new Vector3f(lightPosTransformed.x, lightPosTransformed.y, lightPosTransformed.z);
 		
 		if (verticesData != null) {
 			for (VertexData vertexData : verticesData) {
@@ -141,7 +143,7 @@ public class ObjectModel {
 		///////////////////////////////////////////////////////////////////////////////////
 		transformNormalFromObjectCoordToEyeCoordAndDrawIt(intBufferWrapper, vertex);
 
-
+		vertex.lightingIntensity0to1 = lightingEquation(vertex.pointEyeCoordinates, vertex.normalEyeCoordinates, lightPositionEyeCoordinates, worldModel.lighting_Diffuse, worldModel.lighting_Specular, worldModel.lighting_Ambient, worldModel.lighting_sHininess);
 	}
 
 	private void transformNormalFromObjectCoordToEyeCoordAndDrawIt(IntBufferWrapper intBufferWrapper, VertexData vertex) {
@@ -184,8 +186,6 @@ public class ObjectModel {
 			intBufferWrapper.setPixel((int) vertex2.pointWindowCoordinates.x, (int) vertex2.pointWindowCoordinates.y, 1f, 1f, 1f);
 			intBufferWrapper.setPixel((int) vertex3.pointWindowCoordinates.x, (int) vertex3.pointWindowCoordinates.y, 1f, 1f, 1f);
 			
-
-
 		if (worldModel.displayType == DisplayTypeEnum.FACE_EDGES) {
 			drawLineDDA(intBufferWrapper, vertex1.pointWindowCoordinates, vertex2.pointWindowCoordinates, 1f, 1f, 1f);
 			drawLineDDA(intBufferWrapper, vertex1.pointWindowCoordinates, vertex3.pointWindowCoordinates, 1f, 1f, 1f);
@@ -205,9 +205,19 @@ public class ObjectModel {
 						else if (worldModel.displayType == DisplayTypeEnum.INTERPOlATED_VERTEX_COLOR) { 
 							fragmentData.pixelColor = bc.interpolate(vertex1.color, vertex2.color, vertex3.color);
 						}
-						else if (worldModel.displayType == DisplayTypeEnum.LIGHTING_FLAT) { }
-						else if (worldModel.displayType == DisplayTypeEnum.LIGHTING_GOURARD) { }
-						else if (worldModel.displayType == DisplayTypeEnum.LIGHTING_PHONG) { }
+						else if (worldModel.displayType == DisplayTypeEnum.LIGHTING_FLAT) { 
+							 Vector3f fragmentNormal = (new Vector3f(vertex2.pointEyeCoordinates).sub(vertex1.pointEyeCoordinates))
+									 						.cross((new Vector3f(vertex3.pointEyeCoordinates).sub(vertex1.pointEyeCoordinates)));
+									 
+							 fragmentData.pixelIntensity0to1 = lightingEquation(vertex1.pointEyeCoordinates, fragmentNormal, lightPositionEyeCoordinates, worldModel.lighting_Diffuse, worldModel.lighting_Specular, worldModel.lighting_Ambient, worldModel.lighting_sHininess);
+						}
+						else if (worldModel.displayType == DisplayTypeEnum.LIGHTING_GOURARD) {
+							fragmentData.pixelIntensity0to1 = bc.interpolate(vertex1.lightingIntensity0to1, vertex2.lightingIntensity0to1, vertex3.lightingIntensity0to1);
+						}
+						else if (worldModel.displayType == DisplayTypeEnum.LIGHTING_PHONG) {
+							fragmentData.normalEyeCoordinates = bc.interpolate(vertex1.normalEyeCoordinates, vertex2.normalEyeCoordinates, vertex3.normalEyeCoordinates);
+							fragmentData.pointEyeCoordinates = bc.interpolate(vertex1.pointEyeCoordinates, vertex2.pointEyeCoordinates, vertex3.pointEyeCoordinates);
+						}
 						else if (worldModel.displayType == DisplayTypeEnum.TEXTURE) {
 						} else if (worldModel.displayType == DisplayTypeEnum.TEXTURE_LIGHTING) { }
 						
@@ -232,11 +242,11 @@ public class ObjectModel {
 		} else if (worldModel.displayType == DisplayTypeEnum.INTERPOlATED_VERTEX_COLOR) {
 			return fragmentData.pixelColor;
 		} else if (worldModel.displayType == DisplayTypeEnum.LIGHTING_FLAT) {
-			
+			return new Vector3f(fragmentData.pixelIntensity0to1);
 		} else if (worldModel.displayType == DisplayTypeEnum.LIGHTING_GOURARD) {
-			
+			return new Vector3f(fragmentData.pixelIntensity0to1);
 		} else if (worldModel.displayType == DisplayTypeEnum.LIGHTING_PHONG) {
-			
+			return new Vector3f(lightingEquation(fragmentData.pointEyeCoordinates, fragmentData.normalEyeCoordinates, lightPositionEyeCoordinates, worldModel.lighting_Diffuse, worldModel.lighting_Specular, worldModel.lighting_Ambient, worldModel.lighting_sHininess));
 		} else if (worldModel.displayType == DisplayTypeEnum.TEXTURE) {
 			
 		} else if (worldModel.displayType == DisplayTypeEnum.TEXTURE_LIGHTING) {
@@ -302,20 +312,61 @@ public class ObjectModel {
 
 	
 	float lightingEquation(Vector3f point, Vector3f PointNormal, Vector3f LightPos, float Kd, float Ks, float Ka, float shininess) {
-
-		Vector3f color = lightingEquation(point, PointNormal, LightPos, 
-				                          new Vector3f(Kd), new Vector3f(Ks), new Vector3f(Ka), shininess);
-		return color.get(0);
+		if(point != null) {
+			Vector3f color = lightingEquation(point, PointNormal, LightPos, 
+                    new Vector3f(Kd), new Vector3f(Ks), new Vector3f(Ka), shininess);
+			
+			return color.get(0);
+		}
+		else {
+			return 0f;
+		}
 	}
 	
 	
 	private static Vector3f lightingEquation(Vector3f point, Vector3f PointNormal, Vector3f LightPos, Vector3f Kd,
 			Vector3f Ks, Vector3f Ka, float shininess) {
 
-		Vector3f returnedColor = new Vector3f();
-
-
-		return returnedColor;
+			
+			Vector3f lightPos = LightPos;
+			
+			Vector3f lightDirection = (new Vector3f(lightPos)
+					.sub(point))
+					.normalize(); 
+			
+			Vector3f returnedColor = new Vector3f();
+			
+			//additions
+			Vector3f rayReflection;
+			float dotLightN = new Vector3f(lightDirection).dot(PointNormal);
+			if(dotLightN < 0) {
+				rayReflection = new Vector3f(0f,0f,0f);
+			}
+			else {
+				rayReflection = (
+							new Vector3f(PointNormal)
+							.mul(dotLightN).normalize()
+							.mul(2)
+						)
+						.sub(lightDirection)
+						.normalize();
+			}
+			Vector3f rayOriginDirection = (new Vector3f().sub(point)).normalize();
+			float dotSpectral = Math.max(0, rayOriginDirection.dot(rayReflection));
+			double shinyPow = (Math.pow(dotSpectral,shininess));
+			returnedColor.add(
+					new Vector3f(Ks)
+					.mul((float)shinyPow)
+					);
+			
+			returnedColor.add(new Vector3f(Kd)
+			.mul(	
+					Math.max(0, (new Vector3f(PointNormal).normalize())
+							.dot(lightDirection))
+				));
+			returnedColor.add(new Vector3f(Ka));
+			
+		return returnedColor = new Vector3f((returnedColor.x+returnedColor.y+returnedColor.z)/3);
 	}	
 }
 

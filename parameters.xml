@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <parameters>
-    <modelFileName>C:\Users\Leo\eclipse-workspace\Rasterization\Models\models_without_textures\ZbufferExample.obj</modelFileName>
+    <modelFileName>C:\Users\Leo\eclipse-workspace\Rasterization\Models\models_with_texture\sheep.obj</modelFileName>
     <saveImagePath>./Models/</saveImagePath>
-    <projectionType>PERSPECTIVE</projectionType>
-    <displayType>FACE_COLOR</displayType>
+    <projectionType>ORTHOGRAPHIC</projectionType>
+    <displayType>LIGHTING_PHONG</displayType>
     <displayNormals>false</displayNormals>
-    <exercise>EX_5___lookat</exercise>
+    <exercise>EX_9___Lighting</exercise>
 </parameters>
