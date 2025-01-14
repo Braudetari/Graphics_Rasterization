@@ -161,8 +161,6 @@ public class WorldModel {
 		}
 
 		if(projectionType==ProjectionTypeEnum.ORTHOGRAPHIC) {
-			Vector3f objectDimension = object1.getBoundingBoxDimensions();
-			Vector3f objectCenter = object1.getBoundingBoxCenter();
 			float objectRight = 1.5f;
 			float objectLeft = -1.5f;
 			float objectTop = 1.5f;

@@ -182,9 +182,9 @@ public class ObjectModel {
 //					.cross(new Vector3f(vertex3.pointEyeCoordinates).sub(vertex1.pointEyeCoordinates))
 //					.normalize();
 
-			intBufferWrapper.setPixel((int) vertex1.pointWindowCoordinates.x, (int) vertex1.pointWindowCoordinates.y, 1f, 1f, 1f);
-			intBufferWrapper.setPixel((int) vertex2.pointWindowCoordinates.x, (int) vertex2.pointWindowCoordinates.y, 1f, 1f, 1f);
-			intBufferWrapper.setPixel((int) vertex3.pointWindowCoordinates.x, (int) vertex3.pointWindowCoordinates.y, 1f, 1f, 1f);
+			//intBufferWrapper.setPixel((int) vertex1.pointWindowCoordinates.x, (int) vertex1.pointWindowCoordinates.y, 1f, 1f, 1f);
+			//intBufferWrapper.setPixel((int) vertex2.pointWindowCoordinates.x, (int) vertex2.pointWindowCoordinates.y, 1f, 1f, 1f);
+			//intBufferWrapper.setPixel((int) vertex3.pointWindowCoordinates.x, (int) vertex3.pointWindowCoordinates.y, 1f, 1f, 1f);
 			
 		if (worldModel.displayType == DisplayTypeEnum.FACE_EDGES) {
 			drawLineDDA(intBufferWrapper, vertex1.pointWindowCoordinates, vertex2.pointWindowCoordinates, 1f, 1f, 1f);
@@ -219,7 +219,12 @@ public class ObjectModel {
 							fragmentData.pointEyeCoordinates = bc.interpolate(vertex1.pointEyeCoordinates, vertex2.pointEyeCoordinates, vertex3.pointEyeCoordinates);
 						}
 						else if (worldModel.displayType == DisplayTypeEnum.TEXTURE) {
-						} else if (worldModel.displayType == DisplayTypeEnum.TEXTURE_LIGHTING) { }
+							fragmentData.textureCoordinates = bc.interpolate(vertex1.textureCoordinates, vertex2.textureCoordinates, vertex3.textureCoordinates);
+						} else if (worldModel.displayType == DisplayTypeEnum.TEXTURE_LIGHTING) { 
+							fragmentData.textureCoordinates = bc.interpolate(vertex1.textureCoordinates, vertex2.textureCoordinates, vertex3.textureCoordinates);
+							fragmentData.normalEyeCoordinates = bc.interpolate(vertex1.normalEyeCoordinates, vertex2.normalEyeCoordinates, vertex3.normalEyeCoordinates);
+							fragmentData.pointEyeCoordinates = bc.interpolate(vertex1.pointEyeCoordinates, vertex2.pointEyeCoordinates, vertex3.pointEyeCoordinates);
+						}
 						
 						float pixelDepth = bc.interpolate(vertex1.pointWindowCoordinates, vertex2.pointWindowCoordinates, vertex3.pointWindowCoordinates).z();
 						if(pixelDepth < worldModel.zBuffer[x][y]) {
@@ -248,9 +253,16 @@ public class ObjectModel {
 		} else if (worldModel.displayType == DisplayTypeEnum.LIGHTING_PHONG) {
 			return new Vector3f(lightingEquation(fragmentData.pointEyeCoordinates, fragmentData.normalEyeCoordinates, lightPositionEyeCoordinates, worldModel.lighting_Diffuse, worldModel.lighting_Specular, worldModel.lighting_Ambient, worldModel.lighting_sHininess));
 		} else if (worldModel.displayType == DisplayTypeEnum.TEXTURE) {
-			
+			return textureImageIntBufferWrapper.getPixel(
+					Math.round((textureImageIntBufferWrapper.getImageWidth()-1)*(fragmentData.textureCoordinates.x)-1), //x
+					Math.round((textureImageIntBufferWrapper.getImageHeight()-1)*(fragmentData.textureCoordinates.y))); //y
 		} else if (worldModel.displayType == DisplayTypeEnum.TEXTURE_LIGHTING) {
+			Vector3f color = textureImageIntBufferWrapper.getPixel(
+					Math.round((textureImageIntBufferWrapper.getImageWidth()-1)*(fragmentData.textureCoordinates.x)-1), //x
+					Math.round((textureImageIntBufferWrapper.getImageHeight()-1)*(fragmentData.textureCoordinates.y))); //y
+			Vector3f lighting = new Vector3f(lightingEquation(fragmentData.pointEyeCoordinates, fragmentData.normalEyeCoordinates, lightPositionEyeCoordinates, worldModel.lighting_Diffuse, worldModel.lighting_Specular, worldModel.lighting_Ambient, worldModel.lighting_sHininess));
 			
+			return color.mul(lighting.get(0)); 
 		}
 		return new Vector3f();
 		

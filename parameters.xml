@@ -3,7 +3,7 @@
     <modelFileName>C:\Users\Leo\eclipse-workspace\Rasterization\Models\models_with_texture\sheep.obj</modelFileName>
     <saveImagePath>./Models/</saveImagePath>
     <projectionType>ORTHOGRAPHIC</projectionType>
-    <displayType>LIGHTING_PHONG</displayType>
+    <displayType>TEXTURE_LIGHTING</displayType>
     <displayNormals>false</displayNormals>
-    <exercise>EX_9___Lighting</exercise>
+    <exercise>EX_10__Texture</exercise>
 </parameters>
