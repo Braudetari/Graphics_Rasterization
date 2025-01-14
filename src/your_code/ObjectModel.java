@@ -4,6 +4,7 @@
 
 package your_code;
 
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.util.List;
 
@@ -19,6 +20,7 @@ import app_interface.ExerciseEnum;
 import app_interface.IntBufferWrapper;
 import app_interface.OBJLoader;
 import app_interface.TriangleFace;
+import javafx.scene.image.PixelBuffer;
 
 public class ObjectModel {
 	WorldModel worldModel;
@@ -123,15 +125,21 @@ public class ObjectModel {
 		Vector4f t = new Vector4f(vertex.pointObjectCoordinates, 1f);
 	
 		// Transform only model transformation
-		modelM.transform(t);
-	
-		vertex.pointWindowCoordinates = new Vector3f(t.x, t.y, t.z);
-
-
+		Vector4f tModel = modelM.transform(new Vector4f(t));
+		//Vector3f pointWorldCoordinates = new Vector3f(tModel.x, tModel.y, tModel.z);
+		//lookAt
+		Vector4f tLookAt = lookatM.transform(new Vector4f(tModel));
+		vertex.pointEyeCoordinates = new Vector3f(tLookAt.x, tLookAt.y, tLookAt.z);
+		Vector4f tProjection = projectionM.transform(new Vector4f(tLookAt));
+		if(tProjection.w != 0) { //NDC
+			tProjection.mul(1/tProjection.w);
+		}
+		Vector4f tViewPort = viewportM.transform(new Vector4f(tProjection));
+		vertex.pointWindowCoordinates = new Vector3f(tViewPort.x, tViewPort.y, tViewPort.z);
 			
 		// transformation normal from object coordinates to eye coordinates v->normal
 		///////////////////////////////////////////////////////////////////////////////////
-		//transformNormalFromObjectCoordToEyeCoordAndDrawIt(intBufferWrapper, vertex);
+		transformNormalFromObjectCoordToEyeCoordAndDrawIt(intBufferWrapper, vertex);
 
 
 	}
@@ -182,7 +190,8 @@ public class ObjectModel {
 			drawLineDDA(intBufferWrapper, vertex1.pointWindowCoordinates, vertex2.pointWindowCoordinates, 1f, 1f, 1f);
 			drawLineDDA(intBufferWrapper, vertex1.pointWindowCoordinates, vertex3.pointWindowCoordinates, 1f, 1f, 1f);
 			drawLineDDA(intBufferWrapper, vertex2.pointWindowCoordinates, vertex3.pointWindowCoordinates, 1f, 1f, 1f);
-		} else {
+		} 
+		else {
 			Vector4i box = calcBoundingBox(vertex1.pointWindowCoordinates, vertex2.pointWindowCoordinates, vertex3.pointWindowCoordinates, imageWidth, imageHeight);
 			BarycentricCoordinates bc = new BarycentricCoordinates(vertex1.pointWindowCoordinates, vertex2.pointWindowCoordinates, vertex3.pointWindowCoordinates);
 			for(int y=box.z; y<=box.w; y++) { //Box Y Boundaries (z,w)
@@ -193,14 +202,21 @@ public class ObjectModel {
 						if (worldModel.displayType == DisplayTypeEnum.FACE_COLOR) {
 							fragmentData.pixelColor = faceColor;
 						}
-						else if (worldModel.displayType == DisplayTypeEnum.INTERPOlATED_VERTEX_COLOR) { }
+						else if (worldModel.displayType == DisplayTypeEnum.INTERPOlATED_VERTEX_COLOR) { 
+							fragmentData.pixelColor = bc.interpolate(vertex1.color, vertex2.color, vertex3.color);
+						}
 						else if (worldModel.displayType == DisplayTypeEnum.LIGHTING_FLAT) { }
 						else if (worldModel.displayType == DisplayTypeEnum.LIGHTING_GOURARD) { }
 						else if (worldModel.displayType == DisplayTypeEnum.LIGHTING_PHONG) { }
 						else if (worldModel.displayType == DisplayTypeEnum.TEXTURE) {
 						} else if (worldModel.displayType == DisplayTypeEnum.TEXTURE_LIGHTING) { }
-						Vector3f pixelColor = fragmentProcessing(fragmentData);
-						intBufferWrapper.setPixel((int)x, (int)y, pixelColor);	
+						
+						float pixelDepth = bc.interpolate(vertex1.pointWindowCoordinates, vertex2.pointWindowCoordinates, vertex3.pointWindowCoordinates).z();
+						if(pixelDepth < worldModel.zBuffer[x][y]) {
+							worldModel.zBuffer[x][y] = pixelDepth;
+							Vector3f pixelColor = fragmentProcessing(fragmentData);
+							intBufferWrapper.setPixel((int)x, (int)y, pixelColor);
+						}	
 					}
 				}
 			}
@@ -214,7 +230,7 @@ public class ObjectModel {
 		if (worldModel.displayType == DisplayTypeEnum.FACE_COLOR) {
 			return fragmentData.pixelColor;
 		} else if (worldModel.displayType == DisplayTypeEnum.INTERPOlATED_VERTEX_COLOR) {
-			
+			return fragmentData.pixelColor;
 		} else if (worldModel.displayType == DisplayTypeEnum.LIGHTING_FLAT) {
 			
 		} else if (worldModel.displayType == DisplayTypeEnum.LIGHTING_GOURARD) {

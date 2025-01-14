@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <parameters>
-    <modelFileName>C:\Users\Leo\eclipse-workspace\Rasterization\Models\models_0to600\ex_01___sphere_0to600.obj</modelFileName>
+    <modelFileName>C:\Users\Leo\eclipse-workspace\Rasterization\Models\models_without_textures\ZbufferExample.obj</modelFileName>
     <saveImagePath>./Models/</saveImagePath>
-    <projectionType>ORTHOGRAPHIC</projectionType>
+    <projectionType>PERSPECTIVE</projectionType>
     <displayType>FACE_COLOR</displayType>
     <displayNormals>false</displayNormals>
-    <exercise>EX_3_3_Object_transformation___4_objects</exercise>
+    <exercise>EX_5___lookat</exercise>
 </parameters>

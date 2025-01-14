@@ -96,17 +96,30 @@ public class BarycentricCoordinates {
 	
 	public static void main(String[] args) {
 		
-		Vector3f v1 = new Vector3f(5,1,0);
-		Vector3f v2 = new Vector3f(10,3,0);
-		Vector3f v3 = new Vector3f(7,4,0);
-		BarycentricCoordinates bc = new BarycentricCoordinates(v1, v2, v3);
-		bc.calcCoordinatesForPoint(7, 2);
-		System.out.println(bc);
-		System.out.println(bc.isPointInside());
-		bc.calcCoordinatesForPoint(7, 1);
-		System.out.println(bc);
-		System.out.println(bc.isPointInside());
+		//First Barycentric Exercise
+		/*
+		* Vector3f v2 = new Vector3f(10,3,0);
+		* Vector3f v3 = new Vector3f(7,4,0);
+		* BarycentricCoordinates bc = new BarycentricCoordinates(v1, v2, v3);
+		* bc.calcCoordinatesForPoint(7, 2);
+		* System.out.println(bc);
+		* System.out.println(bc.isPointInside());
+		* bc.calcCoordinatesForPoint(7, 1);
+		* System.out.println(bc);
+		* System.out.println(bc.isPointInside());
+		*/
 		
+		Vector3f v1 = new Vector3f(5,10,0);
+		Vector3f v2 = new Vector3f(10,0,0);
+		Vector3f v3 = new Vector3f(0,0,0);
+		Vector3f color1 = new Vector3f(1f,0f,0f);
+		Vector3f color2 = new Vector3f(0f,1f,0f);
+		Vector3f color3 = new Vector3f(0f,0f,1f);
+		BarycentricCoordinates bc = new BarycentricCoordinates(v1, v2, v3);
+		bc.calcCoordinatesForPoint(5, 0);
+		System.out.println(bc.interpolate(color1, color2, color3));
+		bc.calcCoordinatesForPoint(5, 5);
+		System.out.println(bc.interpolate(color1, color2, color3));
 //		////////////////////////////////////////////////////////////////////////////////////
 //		////////////////////////////////////////////////////////////////////////////////////
 //		/////////////// solution ///////////////////////////////////////////////////////////

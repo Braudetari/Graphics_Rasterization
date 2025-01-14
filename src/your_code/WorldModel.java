@@ -1,3 +1,7 @@
+//Students
+//Leo Feldman		207434879
+//Mor Hodaya Maman	206692592
+
 package your_code;
 
 import java.nio.IntBuffer;
@@ -5,6 +9,7 @@ import java.nio.IntBuffer;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+import org.joml.Vector4f;
 
 import app_interface.DisplayTypeEnum;
 import app_interface.ExerciseEnum;
@@ -156,13 +161,58 @@ public class WorldModel {
 		}
 
 		if(projectionType==ProjectionTypeEnum.ORTHOGRAPHIC) {
-
+			Vector3f objectDimension = object1.getBoundingBoxDimensions();
+			Vector3f objectCenter = object1.getBoundingBoxCenter();
+			float objectRight = 1.5f;
+			float objectLeft = -1.5f;
+			float objectTop = 1.5f;
+			float objectBottom = -1.5f;
+			float objectNear = 0f;
+			float objectFar = 100f;
+			
+			Matrix4f projectionM = new Matrix4f().ortho(objectLeft, objectRight, objectBottom, objectTop, objectNear, objectFar);
+			
+			object1.setProjectionM(projectionM);
 		}
 
 		if(projectionType==ProjectionTypeEnum.PERSPECTIVE) {
-
+			float yFOV = (float)(30f/180f*Math.PI);
+			float aspect = imageWidth/(float)imageHeight;
+			float zNear = 1;
+			float zFar = 100;
+			Matrix4f projectionM = new Matrix4f().perspective(yFOV, aspect, zNear, zFar);
+			object1.setProjectionM(projectionM);
 		}
+		Matrix4f viewportM = YoursUtilities.createViewportMatrix(0f,0f, imageWidth, imageHeight);
 		
+		object1.setViewportM(viewportM);
+		
+		//lookAt
+		//CameraPos = eye
+		//CameraLookAtCenter = center
+		//cameraUp = up
+//		Vector3f lookatW = (new Vector3f(cameraPos).sub(cameraLookAtCenter)).normalize();
+//		Vector3f lookatU = (new Vector3f(cameraUp).cross(lookatW)).normalize();
+//		Vector3f lookatV = new Vector3f(lookatW).cross(lookatU);
+//		
+//		Matrix4f transformEyeToCenter = new Matrix4f(
+//			1f, 0f, 0f, -cameraPos.x,
+//			0f, 1f, 0f, -cameraPos.y,
+//			0f, 0f, 1f, -cameraPos.z,
+//			0f, 0f, 0f, 1f
+//		).transpose();
+//		
+//		Matrix4f transformAligner = new Matrix4f(
+//				lookatU.x, lookatU.y, lookatU.z, 0f,
+//				lookatV.x, lookatV.y, lookatV.z, 0f,
+//				lookatW.x, lookatW.y, lookatW.z, 0f,
+//				0f, 0f, 0f, 1f
+//		).transpose();
+//		
+//		Matrix4f transformLookAtM = new Matrix4f(transformAligner).mul(transformEyeToCenter);
+		
+		Matrix4f transformLookAtM = new Matrix4f().lookAt(cameraPos, cameraLookAtCenter, cameraUp);
+		object1.setLookatM(transformLookAtM);
 		object1.render(intBufferWrapper);
 	}
 	
